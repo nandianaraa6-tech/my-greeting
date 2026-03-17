@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Цэргийн баярын мэнд!</title>
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="h.css">
+
+<style>
+  :root{
+    --bg:#0a1f39;        /* битүү цэнхэр */
+    --rose:#0f3263;      /* сарнайн мөрний өнгө */
+    --paper:#fffdfa;
+    --paper2:#f7f3eb;
+    --ink:#14233f;
+    --accent:#ffd166;
+
+    /* ✉️ Захидлын гарах өндөр (шаардлагатай бол дээрээс нь өөрчилж болно) */
+    --letter-open-translate: -38%; /* өмнө -85% байсныг багасгасан */
+    --letter-scale: 1;
+    
+  }
+
+  html,body{ height:100% }
+  body{
+    margin:0;
+  color:#fff;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  display:flex; align-items:center; justify-content:center;
+  padding:22px;
+  position:relative;
+  overflow:hidden;
+
+  /* Шилэн мэт үндсэн градиент */
+  background: linear-gradient(135deg, #0a1f39 0%, #04193a 40%, #02070e 70%, #0a1f39 100%);
+}
+
+/* ✨ Шилэн гялбаа */
+body::before {
+  background: linear-gradient(135deg, #0a1f39 0%, #04193a 40%, #02070e 70%, #0a1f39 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:1;
+  /* subtle gradient overlay */
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.02), transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02), transparent 60%),
+    linear-gradient(60deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
+  mix-blend-mode: overlay;
+  animation: shimmer 5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Scene болон доторхи элементийг overlay-ээс дээр гаргах */
+.scene {
+  position: relative;
+  z-index:2;
+  width:100%;
+  max-width:520px;
+
+
+body::before {
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%),
+              radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05), transparent 50%);
+  pointer-events:none;
+  mix-blend-mode: overlay;
+  z-index:1;
+}
+
+.scene {
+  position: relative;
+  z-index:2; /* шилэн overlay-ын дээр харагдах */
+  width:100%;
+  max-width:520px;
+}
+
+  }
+
+  .scene{
+    width:100%;
+    max-width:520px;
+    position:relative;
+  }
+
+  /* ===== 🧢 Малгай — илүү бодит (градиент, гялбаа, тэмдэг) ===== */
+  .cap{
+    display:flex; justify-content:center;
+    margin: 6px 0 14px;
+    filter: drop-shadow(0 18px 36px rgba(0,0,0,.45));
+    position:relative; z-index: 5;
+  }
+  .cap svg{ width: 94%; max-width: 520px; height: auto; display:block }
+
+  /* ===== ✉️ Дугтуй хэсэг ===== */
+  .envelope-wrap{
+    position:relative; display:flex; justify-content:center;
+    perspective:1000px;
+    overflow: visible;
+  }
+
+  button.envelope{
+    position:relative;
+    width:380px; max-width:92vw; height:240px;
+    background: linear-gradient(180deg, var(--paper2), #efe8d9);
+    border-radius:14px;
+    border:2px solid rgba(212,175,55,.8);
+    box-shadow: 0 20px 36px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.06);
+    cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent;
+    overflow: visible; /* ✨ захидал бүтнээрээ */
+  }
+
+  .flap{
+    position:absolute; left:0; right:0; top:0; height:62%;
+    transform-origin:50% 0%;
+    background: linear-gradient(180deg, #f3ecdf, #e7ddc8 65%, #dccfb7);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-bottom:1px solid rgba(0,0,0,.08);
+    transition: transform .7s cubic-bezier(.2,.7,.1,1);
+    will-change: transform;
+    z-index:2;
+  }
+  .inner-edge{
+    position:absolute; inset:6px; border-radius:10px;
+    border:1px dashed rgba(0,0,0,.08); pointer-events:none;
+  }
+
+  /* ===== 📄 Мэндчилгээний цаас — бүтнээрээ, scale хамгаалалттай ===== */
+  .letter{
+    position:absolute; left:50%;
+    transform: translate(-50%, 52%) scale(.98);
+    width:92%;
+    background:var(--paper);
+    border-radius:10px;
+    box-shadow:0 10px 24px rgba(0,0,0,.28);
+    color:var(--ink);
+    padding:16px 16px 14px;
+    opacity:0;
+    transition: transform .95s cubic-bezier(.2,.7,.1,1), opacity .6s ease;
+    will-change: transform, opacity;
+    z-index: 3;
+
+    /* Урт текст байвал ч багтана */
+    max-height: 60vh;       /* дэлгэцийн 60% -тай тэнцүү өндөр */
+    overflow: auto;         /* дотор нь гүйлгэнэ */
+  }
+  .letter h2{ margin:0 0 8px; font-size:20px; color:#0d2346; text-align:center }
+  .letter p{ margin:.35em 0; line-height:1.6 }
+  .name{ color:#b18400; font-weight:800 }
+  .sign{ margin-top:10px; opacity:.85; font-size:14px }
+
+  /* Нээгдэх төлөв — ✉️ багасгаж, цаасыг илүү доогуур зогсооно */
+  .scene.open .flap{ transform: rotateX(168deg) }
+  .scene.open .letter{
+    transform: translate(-50%, var(--letter-open-translate)) scale(var(--letter-scale));
+    opacity:1;
+  }
+    
+
+  /* ===== 📄 Цаас-цацарга — хоёр тийш жигд ===== */
+  .confetti{ position:absolute; inset:0; pointer-events:none; overflow:visible }
+  .paper{
+    position:absolute; width:10px; height:14px; background:#fffef7;
+    border:1px solid rgba(0,0,0,.07); border-radius:2px;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+    transform:translate(var(--x,0), var(--y,0)) rotate(var(--r,0deg));
+    opacity:0; will-change: transform, opacity;
+  }
+  @keyframes burst{
+    0%{ transform:translate(0,0) scale(.85) rotate(0deg); opacity:0 }
+    12%{ opacity:1 }
+    100%{ transform:translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity:0 }
+  }
+
+  .hint{ text-align:center; font-size:13px; opacity:.9; margin-top:10px }
+  .btn{
+    background:#153a2c; color:#e8ffe8;
+    border:1px solid #2a824a; border-radius:10px;
+    padding:8px 12px; font-size:13px; cursor:pointer;
+  }
+
+  /* 📱 Жижиг дэлгэц: цаасыг арай бага гаргана, масштаб бага зэрэг бууруулна */
+  @media (max-width:380px){
+    :root{
+      --letter-open-translate: -100%;
+      --letter-scale: .98;
+    }
+    .letter h2{ font-size:18px }
+  }
+</style>
+</head>
+<body>
+
+  <div class="scene" id="scene">
+    <!-- 🧢 Илүү бодит цэргийн малгай -->
+    <div class="cap" aria-hidden="true">
+      <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Цэргийн малгай" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <!-- Дээд хэсгийн gradient (илүү бодит) -->
+          <linearGradient id="capTop" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2a4f85"/>
+            <stop offset="55%" stop-color="#1e3964"/>
+            <stop offset="100%" stop-color="#152845"/>
+          </linearGradient>
+          <!-- Саравчны gradient -->
+          <linearGradient id="visor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0f1a31"/>
+            <stop offset="100%" stop-color="#070d1a"/>
+          </linearGradient>
+          <!-- Тэмдэгний алтлаг gradient -->
+          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffde8a"/>
+            <stop offset="50%" stop-color="#e3b852"/>
+            <stop offset="100%" stop-color="#b88a2f"/>
+          </linearGradient>
+          <!-- Гялбаа -->
+          <radialGradient id="gloss" cx="50%" cy="10%" r="70%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.55)"/>
+            <stop offset="35%" stop-color="rgba(255,255,255,0.12)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Дээд бүрхүүл -->
+        <path d="M40 160c0-64 160-136 280-136s280 72 280 136-560 40-560 0z" fill="url(#capTop)"/>
+        <!-- Сүүдэрлэг нугалаа -->
+        <path d="M60 156c0-44 140-114 260-114s260 70 260 114-520 30-520 0z" fill="rgba(0,0,0,.15)"/>
+        <!-- Гялбааны зураас -->
+        <ellipse cx="320" cy="118" rx="230" ry="70" fill="url(#gloss)" />
+
+        <!-- Саравч -->
+        <path d="M48 210c0 26 168 56 272 56s272-30 272-56-168-30-272-30-272 4-272 30z" fill="url(#visor)"/>
+        <!-- Саравчны гэрэл зурвас -->
+        <path d="M64 198c50-10 150-14 256-14s206 6 256 14" stroke="rgba(255,255,255,.06)" stroke-width="6" stroke-linecap="round"/>
+
+        <!-- Алтлаг тэмдэг — од, лаврын мөчиртэй -->
+        <g transform="translate(320,138)">
+          <circle r="30" fill="url(#gold)" stroke="#9c6f1e" stroke-width="2"/>
+          <!-- Од -->
+          <path d="M0-14 5-2 18-1 8 7 11 20 0 13 -11 20 -8 7 -18-1 -5-2Z" fill="#8b6827"/>
+          <!-- Laurel (зүүн) -->
+          <g fill="#e8c35e" transform="translate(-16,10) scale(.9)">
+            <path d="M-10 0c-6 4-10 10-10 14 5-1 11-4 16-9-2-1-4-3-6-5z"/>
+            <path d="M-4 -4c-5 3-8 7-9 10 4-1 8-3 11-7-1-1-1-2-2-3z"/>
+          </g>
+          <!-- Laurel (баруун) -->
+          <g fill="#e8c35e" transform="translate(16,10) scale(.9)">
+            <path d="M10 0c6 4 10 10 10 14-5-1-11-4-16-9 2-1 4-3 6-5z"/>
+            <path d="M4 -4c5 3 8 7 9 10-4-1-8-3-11-7 1-1 1-2 2-3z"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- ✉️ Дугтуй + захидал -->
+    <div class="envelope-wrap">
+      <!-- Зүрх унах эффект -->
+<div class="hearts" aria-hidden="true"></div>
+<button class="envelope" id="openBtn" aria-label="Дугтуйг нээх">
+        <div class="flap"></div>
+        <div class="inner-edge"></div>
+
+        <!-- 📄 Мэндчилгээний цаас -->
+        <div class="letter" id="letter">
+          <h2></h2>
+          <p><span class="name">Түрүүч М.Гүррагчаа</span> таньд,</p>
+          <p>
+            Эр цэргийн баярын мэнд хүргэе 💂‍♂️✨
+            Өдөр бүр аз жаргалтай, эрүүл энх байгаарай!
+          </p>
+          <p class="sign">
+            Хүндэтгэсэн — Танилцаад удаагүй охин Нандин‑Эрдэнээс ☺️<br>
+            <span style="opacity:.8">2026.03.18</span>
+          </p>
+        </div>
+
+        <!-- 📄 Цаас цацарга -->
+        <div class="confetti" id="confetti" aria-hidden="true"></div>
+      </button>
+    </div>
+
+    <div class="hint">Дугтуйг товшоод мэндчилгээгээ нээгээрэй</div>
+    <div style="text-align:center; margin-top:10px;">
+      <button id="replay" class="btn">Дахин тоглуулах</button>
+    </div>
+    <audio id="bgMusi" loop>
+  <source src="music.mp3" type="audio/mp3">
+</audio>
+  </div>
+
+<script>
+   const heartsContainer = document.getElementById('hearts');
+
+  function createHearts(count = 5) {
+    for (let i = 0; i < count; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+
+      // Санамсаргүй эхлэх байрлал
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      heart.style.left = startX + 'px';
+      heart.style.top = startY + 'px';
+
+      // Санамсаргүй хэмжээ
+      const size = 6 + Math.random() * 10;
+      heart.style.width = heart.style.height = size + 'px';
+
+      // Санамсаргүй хурд, чиглэл
+      const angle = (Math.random() * 160 - 80) * (Math.PI / 180);
+      const power = 80 + Math.random() * 100;
+      const tx = Math.cos(angle) * power;
+      const ty = Math.abs(Math.sin(angle)) * power;
+      heart.style.setProperty('--x', tx + 'px');
+      heart.style.setProperty('--y', ty + 'px');
+
+      heartsContainer.appendChild(heart);
+
+      // animation дууссан тохиолдолд устгах
+      heart.addEventListener('animationend', () => heart.remove());
+    }
+  }
+
+  // 0.2 секунд тутамд зүрх үүсгэх
+  setInterval(() => createHearts(2), 200);
+
+  (function(){
+  const scene = document.getElementById('scene');
+  const btn = document.getElementById('openBtn');
+  const conf = document.getElementById('confetti');
+  const replay = document.getElementById('replay');
+  const audio = document.getElementById('bgMusi');
+
+  let opened = false;
+
+  function makePaperBurst() {
+    const rect = btn.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const originY = rect.height * 0.58;
+
+    const COUNT = 50; // хангалттай confetti
+    conf.innerHTML = ''; // өмнөх confetti-г цэвэрлэх
+    conf.style.left = '0';
+    conf.style.top = '0';
+
+    for (let i = 0; i < COUNT; i++) {
+      const d = document.createElement('div');
+      d.className = 'paper';
+
+      // хэмжээ
+      const w = 6 + Math.random() * 12; // 6..18
+      const h = 8 + Math.random() * 16; // 8..24
+      d.style.width = w + 'px';
+      d.style.height = h + 'px';
+
+      // өнгө
+      const tint = Math.floor(200 + Math.random() * 55);
+      d.style.background = `rgb(${tint}, ${tint}, ${tint-10})`;
+
+      // эхлэх байрлал
+      d.style.left = (centerX - w / 2) + 'px';
+      d.style.top = originY + 'px';
+
+      // санамсаргүй чиглэл
+      const angle = (Math.random() * 160 - 80) * (Math.PI / 180);
+      const power = 110 + Math.random() * 150;
+      const tx = Math.cos(angle) * power;
+      const ty = -Math.abs(Math.sin(angle)) * power - (40 + Math.random() * 70);
+
+      const rot = (Math.random() * 540 - 270).toFixed(1) + 'deg';
+      const dur = (0.95 + Math.random() * 1.1).toFixed(2) + 's';
+      const delay = (Math.random() * 0.12).toFixed(2) + 's';
+
+      d.style.setProperty('--tx', tx + 'px');
+      d.style.setProperty('--ty', ty + 'px');
+      d.style.setProperty('--rot', rot);
+      d.style.animation = `burst ${dur} ease-out ${delay} 1 forwards`;
+
+      conf.appendChild(d);
+    }
+  }
+
+  function openLetter() {
+    if (opened) return;
+    opened = true;
+    scene.classList.add('open');
+
+    // confetti үүсгэх
+    makePaperBurst();
+
+    // дууг тоглуулах
+    audio.play().catch(e => console.log("Audio play blocked:", e));
+  }
+
+  function reset() {
+    opened = false;
+    scene.classList.remove('open');
+    conf.innerHTML = '';  // confetti-ийг арилгах
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  btn.addEventListener('click', openLetter);
+  btn.addEventListener('touchend', openLetter);
+  replay.addEventListener('click', reset);
+})();
+function openLetter() {
+  if (opened) return;
+  opened = true;
+  scene.classList.add('open');
+
+  // confetti
+  makePaperBurst();
+
+  // цэнхэр зүрх
+  makeHearts();
+
+  // дууг тоглуулах
+  audio.play().catch(e => console.log("Audio play blocked:", e));
+}
+
+
+</script>
+</body>
+</html>
